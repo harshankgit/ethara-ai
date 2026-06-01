@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database Service (Mandatory Containerization Requirement)
+  db:
+    image: postgres:15-alpine
+    container_name: inventory_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-inventory_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - inventory_network
+
+  # Python FastAPI Backend Service
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: inventory_backend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-inventory_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - inventory_network
+
+  # Next.js React Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inventory_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - PORT=3000
+    depends_on:
+      - backend
+    networks:
+      - inventory_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  inventory_network:
+    driver: bridge
