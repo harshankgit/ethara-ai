@@ -89,10 +89,16 @@ export default function Sidebar() {
 
       {/* Footer */}
       {!collapsed && (
-        <div className="px-4 py-4 border-t border-gray-800/80">
+        <div className="px-4 py-4 border-t border-gray-800/80 space-y-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">System Online</span>
+          </div>
+          <div className="pt-1">
+            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest leading-relaxed">
+              Created by <span className="text-indigo-400">Harshank</span><br/>
+              for <span className="text-gray-400">Inventory Demo</span>
+            </p>
           </div>
         </div>
       )}
