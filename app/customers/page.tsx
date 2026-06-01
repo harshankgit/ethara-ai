@@ -5,11 +5,11 @@ import {
   Users, Plus, Trash2, X, Search, Filter, Mail, Phone, TrendingUp, 
   UserPlus, Award, Calendar, ChevronRight, Activity, Sparkles,
   ArrowUpRight, Target, Zap, AlertTriangle, PieChart as PieIcon,
-  MousePointer2, UserCheck, Heart, BarChart3, Rocket, BarChart, Bar
+  MousePointer2, UserCheck, Heart, BarChart3, Rocket
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  PieChart, Pie, Cell, LineChart, Line
+  PieChart, Pie, Cell, LineChart, Line, BarChart, Bar
 } from 'recharts';
 
 // Neural Brand Logo

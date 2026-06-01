@@ -6,11 +6,11 @@ import {
   AlertCircle, DollarSign, Package, User, Hash, Clock, ArrowRight,
   ChevronRight, Activity, Zap, PieChart as PieIcon, BarChart3,
   ShieldCheck, ArrowUpRight, MousePointer2, Briefcase, FileText,
-  Rocket, BarChart, Bar
+  Rocket
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
-  Cell, LineChart, Line, PieChart, Pie
+  Cell, LineChart, Line, PieChart, Pie, BarChart, Bar
 } from 'recharts';
 
 // Neural Brand Logo
