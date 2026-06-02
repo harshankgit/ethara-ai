@@ -17,14 +17,14 @@ import {
 const EtharaLogo = () => (
   <div className="flex items-center gap-2.5 group">
     <div className="relative">
-      <div className="absolute inset-0 bg-emerald-500 rounded-xl rotate-6 animate-pulse opacity-20"></div>
-      <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center shadow-xl border border-white/10 transition-transform group-hover:rotate-0">
+      <div className="absolute inset-0 bg-primary rounded-xl rotate-6 animate-pulse opacity-20"></div>
+      <div className="relative w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg border border-border transition-transform group-hover:rotate-0">
         <ShoppingCart size={18} className="text-white" />
       </div>
     </div>
     <div className="flex flex-col">
-      <span className="text-sm font-black text-white tracking-tighter uppercase leading-none italic">ETHARA <span className="text-emerald-500">AI</span></span>
-      <span className="text-[7px] font-black text-emerald-400 uppercase tracking-[0.3em] mt-1">Transaction Core</span>
+      <span className="text-sm font-black text-foreground tracking-tighter uppercase leading-none italic">ETHARA <span className="text-primary">AI</span></span>
+      <span className="text-[7px] font-black text-gray-500 uppercase tracking-[0.3em] mt-1">Transaction Core</span>
     </div>
   </div>
 );
