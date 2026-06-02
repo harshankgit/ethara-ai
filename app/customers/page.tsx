@@ -29,6 +29,7 @@ const EtharaLogo = () => (
 );
 
 export default function Customers() {
+  const [hasMounted, setHasMounted] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ full_name: '', email: '', phone_number: '' });
@@ -51,11 +52,14 @@ export default function Customers() {
     } catch {
       setErrorMsg('Cannot connect to backend.');
     } finally {
-      setTimeout(() => setLoading(false), 800);
+      setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    setHasMounted(true);
+    load(); 
+  }, []);
 
   const filtered = useMemo(() => {
     const q = (search || '').toLowerCase().trim();
@@ -124,7 +128,7 @@ export default function Customers() {
   const getInitials = (name: string) => 
     (name || '').split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??';
 
-  if (loading) {
+  if (!hasMounted || loading) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center animate-in fade-in duration-1000">
         <EtharaLogo />
@@ -163,6 +167,13 @@ export default function Customers() {
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-[10px] font-black uppercase tracking-widest flex justify-between items-center animate-in slide-in-from-top-2">
+          <div className="flex items-center gap-2"><AlertTriangle size={16} /> {errorMsg}</div>
+          <button onClick={() => setErrorMsg('')} className="p-1 hover:bg-red-500/10 rounded-lg transition-colors"><X size={16} /></button>
+        </div>
+      )}
 
       {/* 3 GRAPH MATRIX */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

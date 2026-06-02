@@ -30,6 +30,7 @@ const EtharaLogo = () => (
 );
 
 export default function Products() {
+  const [hasMounted, setHasMounted] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ name: '', sku: '', price: '', quantity: '' });
@@ -46,10 +47,13 @@ export default function Products() {
       if (res.ok) setProducts(await res.json());
       else { const d = await res.json(); setErrorMsg(d.error || 'Failed to load.'); }
     } catch { setErrorMsg('Cannot connect to backend.'); }
-    finally { setTimeout(() => setLoading(false), 800); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    setHasMounted(true);
+    load(); 
+  }, []);
 
   const filtered = useMemo(() => {
     return products
@@ -65,7 +69,6 @@ export default function Products() {
       });
   }, [products, search, stockFilter]);
 
-  // Chart 1: Stock distribution
   const stockChartData = useMemo(() =>
     products.slice(0, 8).map(p => ({
       name: (p.name || '').slice(0, 8) + '…',
@@ -73,14 +76,12 @@ export default function Products() {
       color: (p.quantity || 0) === 0 ? '#ef4444' : (p.quantity || 0) < 10 ? '#f59e0b' : '#6366f1'
     })), [products]);
 
-  // Chart 2: Value distribution (Pie)
   const valuePieData = useMemo(() => [
     { name: 'Stable', value: products.filter(p => p.quantity >= 10).length, color: '#10b981' },
     { name: 'Warning', value: products.filter(p => p.quantity < 10 && p.quantity > 0).length, color: '#f59e0b' },
     { name: 'Depleted', value: products.filter(p => p.quantity === 0).length, color: '#ef4444' }
   ].filter(v => v.value > 0), [products]);
 
-  // Chart 3: Price Matrix (Line)
   const priceData = useMemo(() => 
     products.slice(0, 10).map(p => ({ name: p.sku.slice(-4), price: p.price })), 
   [products]);
@@ -90,6 +91,18 @@ export default function Products() {
     const lowStock = products.filter(p => p.quantity > 0 && p.quantity < 10).length;
     return { totalVal, lowStock };
   }, [products]);
+
+  const startEdit = (p: any) => {
+    setEditingId(p.id);
+    setForm({ name: p.name, sku: p.sku, price: p.price.toString(), quantity: p.quantity.toString() });
+    setErrorMsg('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({ name: '', sku: '', price: '', quantity: '' });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +126,7 @@ export default function Products() {
     load();
   };
 
-  if (loading) {
+  if (!hasMounted || loading) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center animate-in fade-in duration-1000">
         <EtharaLogo />
@@ -216,9 +229,16 @@ export default function Products() {
         {/* Form - Left */}
         <div className="lg:col-span-5 bg-gray-900 border border-white/5 p-8 sm:p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
             <div className={`absolute top-0 left-0 w-1 h-full transition-all group-hover:w-2 ${editingId ? 'bg-amber-500' : 'bg-indigo-600'}`}></div>
-            <h3 className="text-lg font-black text-white mb-8 flex items-center gap-3 tracking-tight uppercase italic">
-              {editingId ? <><Edit size={20} className="text-amber-400" /> Modify Record</> : <><Plus size={20} className="text-indigo-400" /> Commit Asset</>}
-            </h3>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-lg font-black text-white flex items-center gap-3 tracking-tight uppercase italic">
+                {editingId ? <><Edit size={20} className="text-amber-400" /> Modify Record</> : <><Plus size={20} className="text-indigo-400" /> Commit Asset</>}
+              </h3>
+              {editingId && (
+                <button onClick={cancelEdit} className="p-2 hover:bg-white/10 rounded-xl text-gray-500 hover:text-white transition-all">
+                  <X size={20} />
+                </button>
+              )}
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
@@ -237,6 +257,7 @@ export default function Products() {
               <button type="submit" disabled={isSubmitting}
                 className={`w-full group relative flex items-center justify-center gap-3 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all disabled:opacity-50 shadow-xl active:scale-95 overflow-hidden ${editingId ? 'bg-amber-600' : 'bg-indigo-600'}`}>
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                {isSubmitting ? <Activity className="animate-spin" size={18} /> : <Zap size={18} />}
                 {isSubmitting ? 'PROCESSING' : editingId ? 'UPDATE SIGNAL' : 'DECODE & COMMIT'}
               </button>
             </form>
@@ -249,49 +270,56 @@ export default function Products() {
               <input
                 placeholder="Search Catalog Intelligence..."
                 value={search}
-                onChange={e => setSearch(search)}
+                onChange={e => setSearch(e.target.value)}
                 className="w-full bg-gray-900 border border-white/5 text-gray-100 pl-16 pr-6 py-6 rounded-3xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all hover:bg-white/[0.02] shadow-xl"
               />
            </div>
 
            <div className="bg-gray-900 border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-white/[0.02] border-b border-white/5 text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">
-                    <tr>
-                      <th className="px-8 py-5">Protocol</th>
-                      <th className="px-8 py-5">Valuation</th>
-                      <th className="px-8 py-5">Quantifier</th>
-                      <th className="px-8 py-5 text-right">Ops</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {filtered.slice(0, 6).map((p: any) => (
-                      <tr key={p.id} className="group hover:bg-white/[0.02] transition-colors">
-                        <td className="px-8 py-6">
-                           <p className="font-black text-white text-xs uppercase italic tracking-tight">{p.name}</p>
-                           <p className="text-[8px] text-gray-600 font-black tracking-widest mt-1">{p.sku}</p>
-                        </td>
-                        <td className="px-8 py-6 font-black text-white text-sm italic">${parseFloat(p.price).toLocaleString()}</td>
-                        <td className="px-8 py-6">
-                           <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${p.quantity < 10 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
-                              {p.quantity} Units
-                           </span>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                              <button onClick={() => startEdit(p)} className="p-2.5 bg-white/5 hover:bg-amber-600 text-gray-500 hover:text-white rounded-xl transition-all"><Edit size={14} /></button>
-                              <button onClick={() => handleDelete(p.id)} className="p-2.5 bg-white/5 hover:bg-red-600 text-gray-500 hover:text-white rounded-xl transition-all"><Trash2 size={14} /></button>
+              <div className="overflow-x-auto text-[10px] font-black uppercase tracking-widest">
+                 <div className="flex bg-white/[0.02] border-b border-white/5 px-8 py-5 text-gray-600 italic">
+                    <span className="flex-1">Protocol ID</span>
+                    <span className="flex-1">Valuation</span>
+                    <span className="w-20 text-right">Ops</span>
+                 </div>
+                 <div className="divide-y divide-white/5 max-h-[400px] overflow-y-auto">
+                    {filtered.map((p: any) => (
+                      <div key={p.id} className="flex items-center px-8 py-7 group hover:bg-white/[0.02] transition-all">
+                        <div className="flex-1 flex items-center gap-4">
+                           <div className="w-9 h-9 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/20 group-hover:rotate-6 transition-transform">
+                              <Hash size={14} />
                            </div>
-                        </td>
-                      </tr>
+                           <div>
+                              <p className="text-white text-xs font-mono tracking-[0.3em]">#0{p.id}</p>
+                              <p className="text-[7px] text-gray-600 uppercase tracking-widest mt-1 italic">{p.name}</p>
+                           </div>
+                        </div>
+                        <div className="flex-1">
+                           <div className="font-black text-white text-lg tracking-tighter italic">${parseFloat(p.price).toLocaleString()}</div>
+                           <p className="text-[7px] text-gray-700 tracking-widest uppercase mt-1">Indexed Asset</p>
+                        </div>
+                        <div className="w-20 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                           <button onClick={() => startEdit(p)} className="p-2.5 bg-white/5 hover:bg-amber-600 text-gray-400 hover:text-white rounded-xl transition-all"><Edit size={14} /></button>
+                           <button onClick={() => handleDelete(p.id)} className="p-2.5 bg-white/5 hover:bg-red-600 text-gray-600 hover:text-white rounded-xl transition-all"><Trash2 size={14} /></button>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                 </div>
               </div>
            </div>
         </div>
       </div>
     </div>
   );
+}
+
+function Hash(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4" x2="20" y1="9" y2="9" />
+      <line x1="4" x2="20" y1="15" y2="15" />
+      <line x1="10" x2="8" y1="3" y2="21" />
+      <line x1="16" x2="14" y1="3" y2="21" />
+    </svg>
+  )
 }

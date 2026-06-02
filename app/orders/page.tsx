@@ -30,6 +30,7 @@ const EtharaLogo = () => (
 );
 
 export default function Orders() {
+  const [hasMounted, setHasMounted] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -44,23 +45,30 @@ export default function Orders() {
     setLoading(true); setErrorMsg('');
     try {
       const [oRes, cRes, pRes] = await Promise.all([
-        fetch('/api/orders'), fetch('/api/customers'), fetch('/api/products')
+        fetch('/api/orders').then(r => r.ok ? r.json() : []),
+        fetch('/api/customers').then(r => r.ok ? r.json() : []),
+        fetch('/api/products').then(r => r.ok ? r.json() : [])
       ]);
-      if (oRes.ok) setOrders(await oRes.json());
-      if (cRes.ok) setCustomers(await cRes.json());
-      if (pRes.ok) setProducts(await pRes.json());
+      setOrders(Array.isArray(oRes) ? oRes : []);
+      setCustomers(Array.isArray(cRes) ? cRes : []);
+      setProducts(Array.isArray(pRes) ? pRes : []);
     } catch { setErrorMsg('Critical: Connection to logistics hub failed.'); }
-    finally { setTimeout(() => setLoading(false), 800); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    setHasMounted(true);
+    load(); 
+  }, []);
 
-  const filtered = useMemo(() =>
-    orders.filter(o => {
-      const q = search.toLowerCase().trim();
+  const filtered = useMemo(() => {
+    if (!Array.isArray(orders)) return [];
+    return orders.filter(o => {
+      const q = (search || '').toLowerCase().trim();
       const name = (o.customers?.full_name || '').toLowerCase();
       return name.includes(q) || String(o.id).includes(q);
-    }), [orders, search]);
+    });
+  }, [orders, search]);
 
   const selectedProduct = useMemo(() => 
     products.find(p => p.id === parseInt(form.product_id)), 
@@ -70,31 +78,40 @@ export default function Orders() {
 
   // Chart 1: Revenue Velocity
   const revenueData = useMemo(() => {
-    if (orders.length === 0) return [];
+    if (!Array.isArray(orders) || orders.length === 0) return [];
     const groups: any = {};
     [...orders].reverse().forEach(o => {
       const d = new Date(o.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      groups[d] = (groups[d] || 0) + parseFloat(o.total_amount);
+      groups[d] = (groups[d] || 0) + parseFloat(o.total_amount || 0);
     });
     return Object.entries(groups).map(([name, value]) => ({ name, value }));
   }, [orders]);
 
   // Chart 2: Ticket Type Allocation
-  const ticketData = useMemo(() => [
-    { name: 'Standard', value: orders.filter(o => parseFloat(o.total_amount) < 500).length, color: '#10b981' },
-    { name: 'Enterprise', value: orders.filter(o => parseFloat(o.total_amount) >= 500).length, color: '#3b82f6' }
-  ], [orders]);
+  const ticketData = useMemo(() => {
+    if (!Array.isArray(orders)) return [];
+    return [
+      { name: 'Standard', value: orders.filter(o => parseFloat(o.total_amount || 0) < 500).length, color: '#10b981' },
+      { name: 'Enterprise', value: orders.filter(o => parseFloat(o.total_amount || 0) >= 500).length, color: '#3b82f6' }
+    ].filter(t => t.value > 0);
+  }, [orders]);
 
   // Chart 3: Weekly Activity (Bar)
-  const activityData = useMemo(() => 
-    revenueData.slice(-6).map(d => ({ name: d.name, vol: Math.floor(Math.random() * 20) + 10 })), 
-  [revenueData]);
+  const activityData = useMemo(() => {
+    if (revenueData.length === 0) return [];
+    return revenueData.slice(-6).map(d => ({ 
+      name: d.name, 
+      vol: Math.floor(Math.random() * 20) + 10 
+    }));
+  }, [revenueData]);
 
-  const totalRevenue = orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0);
+  const totalRevenue = useMemo(() => 
+    Array.isArray(orders) ? orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0) : 0
+  , [orders]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isStockError) return;
+    if (isStockError || isSubmitting) return;
     setIsSubmitting(true); setErrorMsg('');
     try {
       const res = await fetch('/api/orders', {
@@ -118,7 +135,7 @@ export default function Orders() {
     load();
   };
 
-  if (loading) {
+  if (!hasMounted || loading) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center animate-in fade-in duration-1000">
         <EtharaLogo />
@@ -160,8 +177,6 @@ export default function Orders() {
 
       {/* 3 GRAPH MATRIX */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* GRAPH 1: Area */}
         <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
            <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
               <TrendingUp size={14} className="text-emerald-400" /> Revenue Flow
@@ -182,7 +197,6 @@ export default function Orders() {
            </div>
         </div>
 
-        {/* GRAPH 2: Pie */}
         <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
            <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
               <PieIcon size={14} className="text-blue-400" /> Ticket Ratio
@@ -199,7 +213,6 @@ export default function Orders() {
            </div>
         </div>
 
-        {/* GRAPH 3: Bar */}
         <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
            <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
               <Activity size={14} className="text-indigo-400" /> Daily Signals
@@ -214,13 +227,10 @@ export default function Orders() {
               </ResponsiveContainer>
            </div>
         </div>
-
       </div>
 
       {/* Control Panel Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Creation Panel - Left */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-gray-900 border border-white/5 p-8 sm:p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600 transition-all group-hover:w-2"></div>
@@ -241,7 +251,7 @@ export default function Orders() {
                   <option value="" disabled className="bg-gray-950 text-gray-500">Target Asset...</option>
                   {products.map((p: any) => (
                     <option key={p.id} value={p.id} disabled={p.quantity < 1} className="bg-gray-950 text-gray-100">
-                      {p.name} (${parseFloat(p.price).toFixed(2)})
+                      {p.name} (${parseFloat(p.price || 0).toFixed(2)})
                     </option>
                   ))}
                 </select>
@@ -265,7 +275,6 @@ export default function Orders() {
           </div>
         </div>
 
-        {/* Interactive Search + Ledger */}
         <div className="lg:col-span-7 space-y-8">
            <div className="relative group">
               <Search size={24} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-emerald-500 transition-colors" />
@@ -284,7 +293,7 @@ export default function Orders() {
                     {filtered.map((o: any) => (
                       <div key={o.id} className="flex items-center px-8 py-7 group hover:bg-white/[0.02] transition-all">
                         <div className="flex-1 flex items-center gap-4">
-                           <div className="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 group-hover:rotate-6">
+                           <div className="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:rotate-6">
                               <Hash size={14} />
                            </div>
                            <div>
@@ -293,7 +302,7 @@ export default function Orders() {
                            </div>
                         </div>
                         <div className="flex-1">
-                           <div className="font-black text-white text-lg tracking-tighter italic">${parseFloat(o.total_amount).toLocaleString()}</div>
+                           <div className="font-black text-white text-lg tracking-tighter italic">${parseFloat(o.total_amount || 0).toLocaleString()}</div>
                            <p className="text-[7px] text-gray-700 tracking-widest uppercase mt-1">Verified Signal</p>
                         </div>
                         <div className="w-20 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
@@ -307,6 +316,38 @@ export default function Orders() {
            </div>
         </div>
       </div>
+
+      {activeOrder && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="w-full max-w-3xl bg-gray-900 border border-white/10 rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 bg-emerald-600 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-emerald-600/20">
+                  <ShoppingCart size={28} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic leading-none">PROTOCOL ANALYSIS</h3>
+                </div>
+              </div>
+              <button onClick={() => setActiveOrder(null)} className="p-4 rounded-[1.5rem] bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all">
+                <X size={28} />
+              </button>
+            </div>
+            <div className="p-8 space-y-8 overflow-y-auto flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-4">
+                  <User size={14} className="text-blue-500" />
+                  <p className="text-xl font-black text-white uppercase italic">{activeOrder.customers?.full_name || 'Unknown'}</p>
+                </div>
+                <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-4">
+                  <Clock size={14} className="text-emerald-500" />
+                  <p className="text-xl font-black text-white tracking-tight uppercase italic">{new Date(activeOrder.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
