@@ -125,14 +125,14 @@ export default function Dashboard() {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-1000">
         <div className="relative mb-12">
-          <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full animate-pulse"></div>
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse"></div>
           <EtharaAnimation />
         </div>
         <div className="flex flex-col items-center gap-6">
-          <h2 className="text-xl font-black text-white tracking-[0.4em] uppercase opacity-80 italic">Establishing Neural Link</h2>
+          <h2 className="text-xl font-black text-foreground tracking-[0.4em] uppercase opacity-80 italic">Establishing Neural Link</h2>
           <div className="flex gap-3">
             {[0, 1, 2].map(i => (
-              <div key={i} className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: `${i*0.2}s`}}></div>
+              <div key={i} className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{animationDelay: `${i*0.2}s`}}></div>
             ))}
           </div>
         </div>
@@ -144,27 +144,27 @@ export default function Dashboard() {
     <div className="space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       
       {/* Dynamic Command Header */}
-      <div className="relative p-8 sm:p-12 rounded-[4rem] overflow-hidden bg-gray-900 border border-white/5 shadow-2xl">
-        <div className="absolute top-0 right-0 w-full lg:w-2/3 h-full bg-gradient-to-l from-indigo-600/10 to-transparent"></div>
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px]"></div>
+      <div className="relative p-8 sm:p-12 rounded-[4rem] overflow-hidden bg-surface border border-border shadow-sm">
+        <div className="absolute top-0 right-0 w-full lg:w-2/3 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
         
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
           <div className="space-y-6">
             <EtharaAnimation />
             <p className="text-gray-500 text-sm font-medium max-w-2xl leading-relaxed hidden sm:block">
-              Welcome to the Ethara AI intelligence core. Monitoring <span className="text-indigo-400 font-black">{data.products.length} active assets</span> and global transaction streams.
+              Welcome to the Ethara AI intelligence core. Monitoring <span className="text-primary font-black">{data.products.length} active assets</span> and global transaction streams.
             </p>
           </div>
           
           <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-            <div className="flex-1 lg:flex-none px-8 py-5 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-center gap-8 shadow-2xl">
-               <div className="text-center px-4 border-r border-white/10">
+            <div className="flex-1 lg:flex-none px-8 py-5 bg-background/50 backdrop-blur-2xl border border-border rounded-[2.5rem] flex items-center gap-8 shadow-sm">
+               <div className="text-center px-4 border-r border-border">
                  <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Protocol</div>
-                 <div className="text-lg font-black text-white flex items-center gap-2 italic"><ShieldCheck size={18} className="text-emerald-500" /> SECURE</div>
+                 <div className="text-lg font-black text-foreground flex items-center gap-2 italic"><ShieldCheck size={18} className="text-emerald-500" /> SECURE</div>
                </div>
                <div className="text-center px-4">
                  <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Throughput</div>
-                 <div className="text-lg font-black text-white flex items-center gap-2 italic"><RefreshCw size={18} className="text-blue-500 animate-spin-slow" /> SYNCED</div>
+                 <div className="text-lg font-black text-foreground flex items-center gap-2 italic"><RefreshCw size={18} className="text-blue-500 animate-spin-slow" /> SYNCED</div>
                </div>
             </div>
           </div>
@@ -173,11 +173,11 @@ export default function Dashboard() {
 
       {/* 5 GRAPH INTELLIGENCE MATRIX */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-gray-900/50 border border-white/5 p-8 rounded-[3.5rem] shadow-2xl min-h-[450px] flex flex-col relative group overflow-hidden">
+        <div className="lg:col-span-8 bg-surface border border-border p-8 rounded-[3.5rem] shadow-sm min-h-[450px] flex flex-col relative group overflow-hidden">
            <div className="flex justify-between items-center mb-10 relative z-10">
               <div>
-                <h3 className="text-xl font-black text-white flex items-center gap-3 uppercase italic tracking-tighter">
-                  <Activity size={20} className="text-indigo-500" /> Revenue Velocity
+                <h3 className="text-xl font-black text-foreground flex items-center gap-3 uppercase italic tracking-tighter">
+                  <Activity size={20} className="text-primary" /> Revenue Velocity
                 </h3>
               </div>
            </div>
@@ -186,56 +186,56 @@ export default function Dashboard() {
                 <AreaChart data={salesVelocity}>
                   <defs>
                     <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="6 6" stroke="#ffffff05" vertical={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '24px' }} />
-                  <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={6} fill="url(#salesGrad)" animationDuration={2500} />
+                  <CartesianGrid strokeDasharray="6 6" stroke="var(--border)" vertical={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '24px' }} />
+                  <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={6} fill="url(#salesGrad)" animationDuration={2500} />
                 </AreaChart>
               </ResponsiveContainer>
            </div>
         </div>
 
-        <div className="lg:col-span-4 bg-gray-900/50 border border-white/5 p-8 rounded-[3.5rem] shadow-2xl min-h-[450px] flex flex-col items-center">
+        <div className="lg:col-span-4 bg-surface border border-border p-8 rounded-[3.5rem] shadow-sm min-h-[450px] flex flex-col items-center">
            <div className="flex-1 w-full relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={stockDistribution} cx="50%" cy="50%" innerRadius={70} outerRadius={110} paddingAngle={8} dataKey="value" stroke="none">
                     {stockDistribution.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '16px' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute text-center">
-                <p className="text-4xl font-black text-white tracking-tighter italic">{stats.total}</p>
+                <p className="text-4xl font-black text-foreground tracking-tighter italic">{stats.total}</p>
                 <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Global SKUs</p>
               </div>
            </div>
         </div>
 
-        <div className="lg:col-span-4 bg-gray-900/50 border border-white/5 p-8 rounded-[3.5rem] shadow-2xl h-[400px] flex flex-col relative overflow-hidden">
-           <h3 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-widest mb-6"><Target size={16} className="text-amber-500" /> System Allocation</h3>
+        <div className="lg:col-span-4 bg-surface border border-border p-8 rounded-[3.5rem] shadow-sm h-[400px] flex flex-col relative overflow-hidden">
+           <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-6"><Target size={16} className="text-amber-500" /> System Allocation</h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                  <PolarGrid stroke="#ffffff10" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280' }} />
-                  <Radar name="Internal" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
+                  <PolarGrid stroke="var(--border)" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--foreground)' }} />
+                  <Radar name="Internal" dataKey="A" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.4} />
                   <Radar name="Network" dataKey="B" stroke="#10b981" fill="#10b981" fillOpacity={0.2} />
                 </RadarChart>
               </ResponsiveContainer>
            </div>
         </div>
 
-        <div className="lg:col-span-4 bg-gray-900/50 border border-white/5 p-8 rounded-[3.5rem] shadow-2xl h-[400px] flex flex-col">
-           <h3 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-widest mb-6"><BarChart3 size={16} className="text-emerald-500" /> Value Matrix</h3>
+        <div className="lg:col-span-4 bg-surface border border-border p-8 rounded-[3.5rem] shadow-sm h-[400px] flex flex-col">
+           <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-6"><BarChart3 size={16} className="text-emerald-500" /> Value Matrix</h3>
            <div className="flex-1 w-full text-[9px] font-black uppercase italic">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topAssets} layout="vertical" margin={{ left: -10 }}>
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" tick={{ fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                  <YAxis dataKey="name" type="category" tick={{ fill: 'var(--foreground)' }} axisLine={false} tickLine={false} />
                   <Bar dataKey="value" fill="#10b981" radius={[0, 10, 10, 0]} barSize={16}>
                     {topAssets.map((entry, i) => <Cell key={i} fillOpacity={1 - (i*0.1)} />)}
                   </Bar>
@@ -244,14 +244,14 @@ export default function Dashboard() {
            </div>
         </div>
 
-        <div className="lg:col-span-4 bg-gray-900/50 border border-white/5 p-8 rounded-[3.5rem] shadow-2xl h-[400px] flex flex-col group overflow-hidden">
-           <h3 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-widest mb-6"><Sparkles size={16} className="text-sky-400" /> Growth Projection</h3>
+        <div className="lg:col-span-4 bg-surface border border-border p-8 rounded-[3.5rem] shadow-sm h-[400px] flex flex-col group overflow-hidden">
+           <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-6"><Sparkles size={16} className="text-sky-400" /> Growth Projection</h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={forecastData}>
-                  <CartesianGrid strokeDasharray="6 6" stroke="#ffffff05" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                  <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2 }} />
+                  <CartesianGrid strokeDasharray="6 6" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: 'var(--foreground)' }} axisLine={false} tickLine={false} />
+                  <Line type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={4} dot={{ r: 4, fill: 'var(--primary)', strokeWidth: 2 }} />
                 </LineChart>
               </ResponsiveContainer>
            </div>
@@ -261,17 +261,17 @@ export default function Dashboard() {
       {/* KPI Matrix */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {[
-          { label: 'Global Revenue', val: `$${(data.orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0) / 1000).toFixed(1)}k`, icon: DollarSign, col: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-          { label: 'Asset Valuation', val: `$${(data.products.reduce((s, p) => s + (p.price * p.quantity), 0) / 1000).toFixed(1)}k`, icon: Layers, col: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-          { label: 'Active Identity', val: data.customers.length, icon: Users, col: 'text-blue-400', bg: 'bg-blue-500/10' },
-          { label: 'Neural Health', val: stats.low > 0 ? 'CRITICAL' : 'OPTIMAL', icon: Activity, col: stats.low > 0 ? 'text-amber-400 animate-pulse' : 'text-sky-400', bg: stats.low > 0 ? 'bg-amber-500/10' : 'bg-sky-500/10' }
+          { label: 'Global Revenue', val: `$${(data.orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0) / 1000).toFixed(1)}k`, icon: DollarSign, col: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+          { label: 'Asset Valuation', val: `$${(data.products.reduce((s, p) => s + (p.price * p.quantity), 0) / 1000).toFixed(1)}k`, icon: Layers, col: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'Active Identity', val: data.customers.length, icon: Users, col: 'text-blue-500', bg: 'bg-blue-500/10' },
+          { label: 'Neural Health', val: stats.low > 0 ? 'CRITICAL' : 'OPTIMAL', icon: Activity, col: stats.low > 0 ? 'text-amber-500 animate-pulse' : 'text-sky-500', bg: stats.low > 0 ? 'bg-amber-500/10' : 'bg-sky-500/10' }
         ].map((s, i) => (
-          <div key={i} className="group bg-gray-900 border border-white/5 p-8 rounded-[3rem] hover:bg-white/[0.02] transition-all relative overflow-hidden shadow-2xl">
-            <div className={`w-14 h-14 ${s.bg} ${s.col} rounded-2xl flex items-center justify-center mb-6 border border-white/5 shadow-inner`}>
+          <div key={i} className="group bg-surface border border-border p-8 rounded-[3rem] hover:bg-background transition-all relative overflow-hidden shadow-sm">
+            <div className={`w-14 h-14 ${s.bg} ${s.col} rounded-2xl flex items-center justify-center mb-6 border border-border shadow-inner`}>
               <s.icon size={24} />
             </div>
             <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">{s.label}</p>
-            <h3 className="text-4xl font-black text-white tracking-tighter italic">{s.val}</h3>
+            <h3 className="text-4xl font-black text-foreground tracking-tighter italic">{s.val}</h3>
           </div>
         ))}
       </div>

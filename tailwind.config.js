@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,10 +10,13 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['var(--font-plus-jakarta)', 'var(--font-inter)', 'ui-sans-serif', 'system-ui'],
-        mono: ['ui-monospace', 'SFMono-Regular'],
       },
       colors: {
-        indigo: {
+        background: 'var(--background)',
+        surface: 'var(--surface)',
+        foreground: 'var(--foreground)',
+        primary: {
+          DEFAULT: 'var(--primary)',
           50: '#f5f7ff',
           100: '#ebf0fe',
           200: '#dae3ff',
@@ -25,19 +29,7 @@ module.exports = {
           900: '#273c92',
           950: '#1c2656',
         },
-      },
-      animation: {
-        'shimmer': 'shimmer 2s infinite',
-        'float': 'float 6s ease-in-out infinite',
-      },
-      keyframes: {
-        shimmer: {
-          '100%': { transform: 'translateX(100%)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
-        }
+        border: 'var(--border)',
       },
     },
   },

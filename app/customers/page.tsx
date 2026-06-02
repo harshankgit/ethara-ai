@@ -119,9 +119,11 @@ export default function Customers() {
     }
   };
 
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this identity?')) return;
     await fetch(`/api/customers/${id}`, { method: 'DELETE' });
+    setDeleteId(null);
     load();
   };
 
@@ -145,31 +147,31 @@ export default function Customers() {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
       
       {/* Hero Header */}
-      <div className="relative p-8 sm:p-12 rounded-[3.5rem] overflow-hidden bg-gray-900 border border-white/5 shadow-2xl">
-        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-gradient-to-l from-blue-600/10 to-transparent"></div>
+      <div className="relative p-8 sm:p-12 rounded-[3.5rem] overflow-hidden bg-surface border border-border shadow-sm">
+        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
           <div className="space-y-6">
             <EtharaLogo />
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-none">CRM Identity</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">CRM Identity</h1>
             <p className="text-gray-500 text-sm font-medium max-w-xl leading-relaxed hidden sm:block">
               Manage subject identities and neural contact vectors. Track enrollment growth and relationship stability across the network.
             </p>
           </div>
-          <div className="flex-1 lg:flex-none px-8 py-6 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-center gap-10 shadow-2xl">
+          <div className="flex-1 lg:flex-none px-8 py-6 bg-background/50 backdrop-blur-2xl border border-border rounded-[2.5rem] flex items-center gap-10 shadow-sm">
              <div className="text-center">
                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Total Identity</div>
-               <div className="text-2xl font-black text-white italic">{customers.length}</div>
+               <div className="text-2xl font-black text-foreground italic">{customers.length}</div>
              </div>
-             <div className="text-center pl-10 border-l border-white/10">
+             <div className="text-center pl-10 border-l border-border">
                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Growth</div>
-               <div className="text-2xl font-black text-emerald-400 italic">+{growthData.length > 0 ? (growthData[growthData.length-1] as any).value : 0}</div>
+               <div className="text-2xl font-black text-emerald-500 italic">+{growthData.length > 0 ? (growthData[growthData.length-1] as any).value : 0}</div>
              </div>
           </div>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-[10px] font-black uppercase tracking-widest flex justify-between items-center animate-in slide-in-from-top-2">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest flex justify-between items-center animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2"><AlertTriangle size={16} /> {errorMsg}</div>
           <button onClick={() => setErrorMsg('')} className="p-1 hover:bg-red-500/10 rounded-lg transition-colors"><X size={16} /></button>
         </div>
@@ -179,30 +181,30 @@ export default function Customers() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* GRAPH 1: Area */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <TrendingUp size={14} className="text-blue-400" /> Enrollment Velocity
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <TrendingUp size={14} className="text-blue-500" /> Enrollment Velocity
            </h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={growthData}>
                   <defs>
                     <linearGradient id="cGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
-                  <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={4} fill="url(#cGrad)" animationDuration={2000} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                  <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={4} fill="url(#cGrad)" animationDuration={2000} />
                 </AreaChart>
               </ResponsiveContainer>
            </div>
         </div>
 
         {/* GRAPH 2: Pie */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <PieIcon size={14} className="text-indigo-400" /> Status Allocation
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <PieIcon size={14} className="text-indigo-500" /> Status Allocation
            </h3>
            <div className="flex-1 w-full relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
@@ -210,22 +212,22 @@ export default function Customers() {
                   <Pie data={statusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={8} dataKey="value" stroke="none">
                     {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
            </div>
         </div>
 
         {/* GRAPH 3: Bar */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <BarChart3 size={14} className="text-emerald-400" /> Weekly Signals
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <BarChart3 size={14} className="text-emerald-500" /> Weekly Signals
            </h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={velocityData}>
-                  <XAxis dataKey="name" tick={{ fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                  <XAxis dataKey="name" tick={{ fill: 'var(--foreground)' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
                   <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} barSize={16} />
                 </BarChart>
               </ResponsiveContainer>
@@ -239,22 +241,22 @@ export default function Customers() {
         
         {/* Form - Left */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-gray-900 border border-white/5 p-8 sm:p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-blue-600 transition-all group-hover:w-2"></div>
-            <h3 className="text-lg font-black text-white mb-8 flex items-center gap-3 tracking-tight uppercase italic">
-              <UserPlus size={20} className="text-blue-400" /> Subject Enrollment
+          <div className="bg-surface border border-border p-8 sm:p-10 rounded-[3rem] shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary transition-all group-hover:w-2"></div>
+            <h3 className="text-lg font-black text-foreground mb-8 flex items-center gap-3 tracking-tight uppercase italic">
+              <UserPlus size={20} className="text-primary" /> Subject Enrollment
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-5">
               <input required placeholder="Legal Identity..." value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })}
-                className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:bg-white/[0.08]" />
+                className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background/50" />
               <input required type="email" placeholder="Endpoint Email..." value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:bg-white/[0.08]" />
+                className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background/50" />
               <input required placeholder="Contact Vector..." value={form.phone_number} onChange={e => setForm({ ...form, phone_number: e.target.value })}
-                className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:bg-white/[0.08]" />
+                className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background/50" />
 
               <button type="submit" disabled={isSubmitting}
-                className="w-full group relative flex items-center justify-center gap-3 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all disabled:opacity-50 shadow-xl active:scale-95 overflow-hidden mt-4">
+                className="w-full group relative flex items-center justify-center gap-3 py-5 bg-primary hover:bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all disabled:opacity-50 shadow-sm active:scale-95 overflow-hidden mt-4">
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                 {isSubmitting ? <Activity className="animate-spin" size={18} /> : <Zap size={18} />}
                 {isSubmitting ? 'PROCESSING' : 'ESTABLISH LINK'}
@@ -266,50 +268,65 @@ export default function Customers() {
         {/* Search + Ledger */}
         <div className="lg:col-span-7 space-y-8">
            <div className="relative group">
-              <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+              <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors" />
               <input
                 placeholder="Search Identity Core..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full bg-gray-900 border border-white/5 text-gray-100 pl-16 pr-6 py-6 rounded-3xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all hover:bg-white/[0.02] shadow-xl"
+                className="w-full bg-surface border border-border text-foreground pl-16 pr-6 py-6 rounded-3xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background shadow-sm"
               />
            </div>
 
-           <div className="bg-gray-900 border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+           <div className="bg-surface border border-border rounded-[3rem] overflow-hidden shadow-sm">
               <div className="overflow-x-auto text-[10px] font-black uppercase tracking-widest">
-                 <div className="flex bg-white/[0.02] border-b border-white/5 px-8 py-5 text-gray-600">
+                 <div className="flex bg-background/50 border-b border-border px-8 py-5 text-gray-500">
                     <span className="flex-1">Identity Protocol</span>
                     <span className="flex-1">Endpoint</span>
                     <span className="w-20 text-right">Ops</span>
                  </div>
-                 <div className="divide-y divide-white/5 max-h-[400px] overflow-y-auto">
-                    {filtered.map((c, idx) => (
-                      <div key={c.id} className="flex items-center px-8 py-6 group hover:bg-white/[0.02] transition-colors">
+                 <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
+                    {filtered.length > 0 ? filtered.map((c, idx) => (
+                      <div key={c.id} className="flex items-center px-8 py-6 group hover:bg-background transition-colors">
                         <div className="flex-1 flex items-center gap-4">
-                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${['from-blue-600 to-indigo-600', 'from-purple-600 to-pink-600', 'from-emerald-600 to-teal-600'][idx % 3]} flex items-center justify-center text-white font-black italic shadow-lg`}>
+                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${['from-blue-600 to-indigo-600', 'from-purple-600 to-pink-600', 'from-emerald-600 to-teal-600'][idx % 3]} flex items-center justify-center text-white font-black italic shadow-sm`}>
                               {getInitials(c.full_name)}
                            </div>
                            <div>
-                              <p className="text-white text-xs italic tracking-tight">{c.full_name}</p>
-                              <p className="text-[7px] text-gray-600 tracking-[0.2em] mt-1">ID: #0{c.id}</p>
+                              <p className="text-foreground text-xs italic tracking-tight">{c.full_name}</p>
+                              <p className="text-[7px] text-gray-500 tracking-[0.2em] mt-1">ID: #0{c.id}</p>
                            </div>
                         </div>
-                        <div className="flex-1 text-gray-400">
+                        <div className="flex-1 text-gray-500">
                            <p className="lowercase font-bold tracking-tight">{c.email}</p>
-                           <p className="text-[8px] text-gray-600 mt-1">{c.phone_number}</p>
+                           <p className="text-[8px] text-gray-500 mt-1">{c.phone_number}</p>
                         </div>
                         <div className="w-20 text-right">
-                           <button onClick={() => handleDelete(c.id)} className="p-2.5 bg-white/5 hover:bg-red-600 text-gray-600 hover:text-white rounded-xl transition-all opacity-0 group-hover:opacity-100">
+                           <button onClick={() => setDeleteId(c.id)} className="p-2.5 bg-background hover:bg-red-500 border border-border text-gray-400 hover:text-white rounded-xl transition-all opacity-0 group-hover:opacity-100">
                               <Trash2 size={14} />
                            </button>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                        <div className="px-8 py-16 text-center text-gray-500">No identities found in the neural link.</div>
+                    )}
                  </div>
               </div>
            </div>
         </div>
       </div>
+      
+      {deleteId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-2xl max-w-sm w-full animate-in zoom-in-95">
+            <h3 className="text-xl font-black text-foreground uppercase italic mb-4">Purge Identity</h3>
+            <p className="text-sm text-gray-500 mb-8">Are you sure you want to delete this subject identity? This action cannot be reversed.</p>
+            <div className="flex gap-4">
+              <button onClick={() => setDeleteId(null)} className="flex-1 px-6 py-4 rounded-2xl bg-background border border-border text-foreground hover:bg-border transition-all">Cancel</button>
+              <button onClick={() => handleDelete(deleteId)} className="flex-1 px-6 py-4 rounded-2xl bg-red-600 hover:bg-red-500 text-white transition-all">Confirm Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -35,6 +35,7 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ name: '', sku: '', price: '', quantity: '' });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [search, setSearch] = useState('');
@@ -114,14 +115,22 @@ export default function Products() {
         body: JSON.stringify({ name: form.name, sku: form.sku, price: parseFloat(form.price), quantity: parseInt(form.quantity) }),
         headers: { 'Content-Type': 'application/json' }
       });
-      if (res.ok) { setForm({ name: '', sku: '', price: '', quantity: '' }); setEditingId(null); load(); }
-      else { const d = await res.json(); setErrorMsg(d.error || 'Operation failed.'); }
-    } catch { setErrorMsg('Network error.'); }
-    finally { setIsSubmitting(false); }
+      if (res.ok) { 
+        setForm({ name: '', sku: '', price: '', quantity: '' }); 
+        setEditingId(null); 
+        await load(); // Await load to ensure state update completes
+      } else { 
+        const d = await res.json(); 
+        setErrorMsg(d.error || 'Operation failed.'); 
+      }
+    } catch { 
+      setErrorMsg('Network error.'); 
+    } finally { 
+      setIsSubmitting(false); 
+    }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Purge asset from neural catalog?')) return;
     await fetch(`/api/products/${id}`, { method: 'DELETE' });
     load();
   };
@@ -143,24 +152,24 @@ export default function Products() {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
 
       {/* Hero Header */}
-      <div className="relative p-8 sm:p-12 rounded-[3.5rem] overflow-hidden bg-gray-900 border border-white/5 shadow-2xl">
-        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-gradient-to-l from-indigo-600/10 to-transparent"></div>
+      <div className="relative p-8 sm:p-12 rounded-[3.5rem] overflow-hidden bg-surface border border-border shadow-sm">
+        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
           <div className="space-y-6">
             <EtharaLogo />
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter uppercase italic leading-none">Asset Catalog</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">Asset Catalog</h1>
             <p className="text-gray-500 text-sm font-medium max-w-xl leading-relaxed hidden sm:block">
               Manage enterprise assets with neural-link precision. Monitor stock quantifier signals and global inventory valuations in real-time.
             </p>
           </div>
-          <div className="flex-1 lg:flex-none px-8 py-6 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-center gap-10 shadow-2xl">
+          <div className="flex-1 lg:flex-none px-8 py-6 bg-background/50 backdrop-blur-2xl border border-border rounded-[2.5rem] flex items-center gap-10 shadow-sm">
              <div className="text-center">
                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Total Assets</div>
-               <div className="text-2xl font-black text-white italic">{products.length}</div>
+               <div className="text-2xl font-black text-foreground italic">{products.length}</div>
              </div>
-             <div className="text-center pl-10 border-l border-white/10">
+             <div className="text-center pl-10 border-l border-border">
                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Valuation</div>
-               <div className="text-2xl font-black text-indigo-400 italic">${(stats.totalVal / 1000).toFixed(1)}k</div>
+               <div className="text-2xl font-black text-primary italic">${(stats.totalVal / 1000).toFixed(1)}k</div>
              </div>
           </div>
         </div>
@@ -170,15 +179,15 @@ export default function Products() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* GRAPH 1: Bar */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <BarChart2 size={14} className="text-indigo-400" /> Stock Quantifier
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <BarChart2 size={14} className="text-primary" /> Stock Quantifier
            </h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stockChartData}>
-                  <XAxis dataKey="name" tick={{ fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                  <XAxis dataKey="name" tick={{ fill: 'var(--foreground)' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
                   <Bar dataKey="Stock" radius={[4, 4, 0, 0]} barSize={16}>
                     {stockChartData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Bar>
@@ -188,9 +197,9 @@ export default function Products() {
         </div>
 
         {/* GRAPH 2: Pie */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <PieIcon size={14} className="text-blue-400" /> Health Ratio
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <PieIcon size={14} className="text-blue-500" /> Health Ratio
            </h3>
            <div className="flex-1 w-full relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
@@ -198,23 +207,23 @@ export default function Products() {
                   <Pie data={valuePieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={8} dataKey="value" stroke="none">
                     {valuePieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
            </div>
         </div>
 
         {/* GRAPH 3: Line */}
-        <div className="bg-gray-900/50 border border-white/5 p-8 rounded-[3rem] shadow-2xl h-[350px] flex flex-col">
-           <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest mb-8">
-              <TrendingUp size={14} className="text-emerald-400" /> Price Vector
+        <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-sm h-[350px] flex flex-col">
+           <h3 className="text-[10px] font-black text-foreground flex items-center gap-2 uppercase tracking-widest mb-8">
+              <TrendingUp size={14} className="text-emerald-500" /> Price Vector
            </h3>
            <div className="flex-1 w-full text-[9px] font-black">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={priceData}>
-                  <CartesianGrid strokeDasharray="6 6" stroke="#ffffff05" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                  <CartesianGrid strokeDasharray="6 6" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: 'var(--foreground)' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '12px' }} />
                   <Line type="monotone" dataKey="price" stroke="#10b981" strokeWidth={4} dot={{ r: 4, fill: '#10b981', strokeWidth: 2 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -227,14 +236,14 @@ export default function Products() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Form - Left */}
-        <div className="lg:col-span-5 bg-gray-900 border border-white/5 p-8 sm:p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
-            <div className={`absolute top-0 left-0 w-1 h-full transition-all group-hover:w-2 ${editingId ? 'bg-amber-500' : 'bg-indigo-600'}`}></div>
+        <div className="lg:col-span-5 bg-surface border border-border p-8 sm:p-10 rounded-[3rem] shadow-sm relative overflow-hidden group">
+            <div className={`absolute top-0 left-0 w-1 h-full transition-all group-hover:w-2 ${editingId ? 'bg-amber-500' : 'bg-primary'}`}></div>
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-lg font-black text-white flex items-center gap-3 tracking-tight uppercase italic">
-                {editingId ? <><Edit size={20} className="text-amber-400" /> Modify Record</> : <><Plus size={20} className="text-indigo-400" /> Commit Asset</>}
+              <h3 className="text-lg font-black text-foreground flex items-center gap-3 tracking-tight uppercase italic">
+                {editingId ? <><Edit size={20} className="text-amber-400" /> Modify Record</> : <><Plus size={20} className="text-primary" /> Commit Asset</>}
               </h3>
               {editingId && (
-                <button onClick={cancelEdit} className="p-2 hover:bg-white/10 rounded-xl text-gray-500 hover:text-white transition-all">
+                <button onClick={cancelEdit} className="p-2 hover:bg-border rounded-xl text-gray-500 hover:text-foreground transition-all">
                   <X size={20} />
                 </button>
               )}
@@ -243,19 +252,19 @@ export default function Products() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <input required placeholder="Asset Identity..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all hover:bg-white/[0.08]" />
+                  className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background/50" />
                 <input required placeholder="UPC-XXX-SIGNAL" value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })}
-                  className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all hover:bg-white/[0.08]" />
+                  className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background/50" />
                 <div className="grid grid-cols-2 gap-4">
                   <input required type="number" step="0.01" min="0" placeholder="Valuation ($)" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })}
-                    className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all" />
+                    className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all" />
                   <input required type="number" min="0" placeholder="Quantifier" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })}
-                    className="w-full bg-white/5 text-gray-100 border border-white/10 px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all" />
+                    className="w-full bg-background text-foreground border border-border px-6 py-4 rounded-2xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all" />
                 </div>
               </div>
 
               <button type="submit" disabled={isSubmitting}
-                className={`w-full group relative flex items-center justify-center gap-3 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all disabled:opacity-50 shadow-xl active:scale-95 overflow-hidden ${editingId ? 'bg-amber-600' : 'bg-indigo-600'}`}>
+                className={`w-full group relative flex items-center justify-center gap-3 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all disabled:opacity-50 shadow-sm active:scale-95 overflow-hidden ${editingId ? 'bg-amber-600' : 'bg-primary'}`}>
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                 {isSubmitting ? <Activity className="animate-spin" size={18} /> : <Zap size={18} />}
                 {isSubmitting ? 'PROCESSING' : editingId ? 'UPDATE SIGNAL' : 'DECODE & COMMIT'}
@@ -266,41 +275,41 @@ export default function Products() {
         {/* Interactive Search + Ledger */}
         <div className="lg:col-span-7 space-y-8">
            <div className="relative group">
-              <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 transition-colors" />
+              <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors" />
               <input
                 placeholder="Search Catalog Intelligence..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full bg-gray-900 border border-white/5 text-gray-100 pl-16 pr-6 py-6 rounded-3xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all hover:bg-white/[0.02] shadow-xl"
+                className="w-full bg-surface border border-border text-foreground pl-16 pr-6 py-6 rounded-3xl text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all hover:bg-background shadow-sm"
               />
            </div>
 
-           <div className="bg-gray-900 border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+           <div className="bg-surface border border-border rounded-[3rem] overflow-hidden shadow-sm">
               <div className="overflow-x-auto text-[10px] font-black uppercase tracking-widest">
-                 <div className="flex bg-white/[0.02] border-b border-white/5 px-8 py-5 text-gray-600 italic">
+                 <div className="flex bg-background/50 border-b border-border px-8 py-5 text-gray-500 italic">
                     <span className="flex-1">Protocol ID</span>
                     <span className="flex-1">Valuation</span>
                     <span className="w-20 text-right">Ops</span>
                  </div>
-                 <div className="divide-y divide-white/5 max-h-[400px] overflow-y-auto">
+                 <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
                     {filtered.map((p: any) => (
-                      <div key={p.id} className="flex items-center px-8 py-7 group hover:bg-white/[0.02] transition-all">
+                      <div key={p.id} className="flex items-center px-8 py-7 group hover:bg-background transition-all">
                         <div className="flex-1 flex items-center gap-4">
-                           <div className="w-9 h-9 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 border border-indigo-500/20 group-hover:rotate-6 transition-transform">
+                           <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20 group-hover:rotate-6 transition-transform">
                               <Hash size={14} />
                            </div>
                            <div>
-                              <p className="text-white text-xs font-mono tracking-[0.3em]">#0{p.id}</p>
-                              <p className="text-[7px] text-gray-600 uppercase tracking-widest mt-1 italic">{p.name}</p>
+                              <p className="text-foreground text-xs font-mono tracking-[0.3em]">#0{p.id}</p>
+                              <p className="text-[7px] text-gray-500 uppercase tracking-widest mt-1 italic">{p.name}</p>
                            </div>
                         </div>
                         <div className="flex-1">
-                           <div className="font-black text-white text-lg tracking-tighter italic">${parseFloat(p.price).toLocaleString()}</div>
-                           <p className="text-[7px] text-gray-700 tracking-widest uppercase mt-1">Indexed Asset</p>
+                           <div className="font-black text-foreground text-lg tracking-tighter italic">${parseFloat(p.price).toLocaleString()}</div>
+                           <p className="text-[7px] text-gray-500 tracking-widest uppercase mt-1">Indexed Asset</p>
                         </div>
                         <div className="w-20 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                           <button onClick={() => startEdit(p)} className="p-2.5 bg-white/5 hover:bg-amber-600 text-gray-400 hover:text-white rounded-xl transition-all"><Edit size={14} /></button>
-                           <button onClick={() => handleDelete(p.id)} className="p-2.5 bg-white/5 hover:bg-red-600 text-gray-600 hover:text-white rounded-xl transition-all"><Trash2 size={14} /></button>
+                           <button onClick={() => startEdit(p)} className="p-2.5 bg-background hover:bg-amber-500 border border-border text-gray-400 hover:text-white rounded-xl transition-all"><Edit size={14} /></button>
+                           <button onClick={() => setDeleteId(p.id)} className="p-2.5 bg-background hover:bg-red-500 border border-border text-gray-400 hover:text-white rounded-xl transition-all"><Trash2 size={14} /></button>
                         </div>
                       </div>
                     ))}
@@ -309,6 +318,18 @@ export default function Products() {
            </div>
         </div>
       </div>
+      {deleteId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-surface border border-border p-8 rounded-[3rem] shadow-2xl max-w-sm w-full animate-in zoom-in-95">
+            <h3 className="text-xl font-black text-foreground uppercase italic mb-4">Purge Asset</h3>
+            <p className="text-sm text-gray-500 mb-8">Are you sure you want to purge this asset from the neural catalog? This action cannot be reversed.</p>
+            <div className="flex gap-4">
+              <button onClick={() => setDeleteId(null)} className="flex-1 px-6 py-4 rounded-2xl bg-background border border-border text-foreground hover:bg-border transition-all">Cancel</button>
+              <button onClick={() => handleDelete(deleteId)} className="flex-1 px-6 py-4 rounded-2xl bg-red-600 hover:bg-red-500 text-white transition-all">Confirm Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
