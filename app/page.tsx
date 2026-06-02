@@ -19,18 +19,18 @@ import {
 const EtharaAnimation = () => (
   <div className="flex items-center gap-3 animate-in fade-in zoom-in duration-1000 slide-in-from-left-4">
     <div className="relative group">
-      <div className="absolute inset-0 bg-indigo-500 rounded-2xl rotate-6 animate-pulse opacity-20 group-hover:rotate-12 transition-transform"></div>
-      <div className="relative w-14 h-14 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-2xl border border-white/10 group-hover:scale-105 transition-all">
+      <div className="absolute inset-0 bg-primary rounded-2xl rotate-6 animate-pulse opacity-20 group-hover:rotate-12 transition-transform"></div>
+      <div className="relative w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg border border-border group-hover:scale-105 transition-all">
         <Rocket size={28} className="text-white" />
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#020617] animate-ping"></div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-surface animate-ping"></div>
       </div>
     </div>
     <div className="flex flex-col">
-      <h1 className="text-3xl font-black text-white tracking-tighter uppercase leading-none italic">
-        ETHARA <span className="text-indigo-500">AI</span>
+      <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-none italic">
+        ETHARA <span className="text-primary">AI</span>
       </h1>
       <div className="flex items-center gap-2 mt-1.5">
-        <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 text-[8px] font-black uppercase tracking-[0.2em] rounded-full border border-indigo-500/20">
+        <span className="px-2 py-0.5 bg-primary/10 text-primary text-[8px] font-black uppercase tracking-[0.2em] rounded-full border border-primary/20">
           Neural Core Active
         </span>
       </div>
