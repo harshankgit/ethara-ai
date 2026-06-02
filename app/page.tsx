@@ -148,7 +148,7 @@ export default function Dashboard() {
         <div className="absolute top-0 right-0 w-full lg:w-2/3 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
         
-        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
+        <div className="relative z-10 flex flex-col gap-8">
           <div className="space-y-6">
             <EtharaAnimation />
             <p className="text-gray-500 text-sm font-medium max-w-2xl leading-relaxed hidden sm:block">
@@ -156,15 +156,15 @@ export default function Dashboard() {
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-            <div className="flex-1 lg:flex-none px-8 py-5 bg-background/50 backdrop-blur-2xl border border-border rounded-[2.5rem] flex items-center gap-8 shadow-sm">
-               <div className="text-center px-4 border-r border-border">
-                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Protocol</div>
-                 <div className="text-lg font-black text-foreground flex items-center gap-2 italic"><ShieldCheck size={18} className="text-emerald-500" /> SECURE</div>
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <div className="px-6 py-4 bg-background/50 backdrop-blur-2xl border border-border rounded-[2rem] flex items-center justify-between sm:justify-start gap-8 shadow-sm">
+               <div className="text-center px-2 border-r border-border">
+                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Protocol</div>
+                 <div className="text-sm font-black text-foreground flex items-center gap-2 italic"><ShieldCheck size={16} className="text-emerald-500" /> SECURE</div>
                </div>
-               <div className="text-center px-4">
-                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Throughput</div>
-                 <div className="text-lg font-black text-foreground flex items-center gap-2 italic"><RefreshCw size={18} className="text-blue-500 animate-spin-slow" /> SYNCED</div>
+               <div className="text-center px-2">
+                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Throughput</div>
+                 <div className="text-sm font-black text-foreground flex items-center gap-2 italic"><RefreshCw size={16} className="text-blue-500 animate-spin-slow" /> SYNCED</div>
                </div>
             </div>
           </div>
